@@ -1,4 +1,14 @@
 # UOCIS322 - Project 5 #
+# Aidan McCoy
+# Description
+
+Description: the point of this project is implemnt a time calculation algoirthim from a website and untilize for own 
+project so that we  can track the amount time for a distance run at a minimum speed and maximum speed. We will also be
+implementing testcases for this algorithim to make sure it works correctly
+
+the purpose of this project is also too create a storage interaction for acp times using mongoDb and docker-compose to be able to store the brevet distance and times from website in a database and be able to callback that data and overwrite
+it using two buttons implemented onto the webpage
+
 Brevet time calculator with MongoDB!
 
 ## Overview

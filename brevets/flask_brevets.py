@@ -11,6 +11,7 @@ import acp_times  # Brevet time calculations
 import config
 
 import logging
+import os
 from pymongo import MongoClient
 
 ###
@@ -20,19 +21,19 @@ app = flask.Flask(__name__)
 CONFIG = config.configuration()
 
 # Set up MongoDB connection
-client = MongoClient('mongodb://' + os.environ['MONGODB_HOSTNAME'], 27018)
+client = MongoClient('mongodb://' + os.environ['MONGODB_HOSTNAME'], 27017)
 
-# Select or create the database
-db = client['brevet_database']
+# use database brevets
+db = client.brevets
 
-# Define a collection (similar to a table in relational databases)
-brevet_collection = db['brevet_collection']
+# use conlection "controls" in the database
+brevet_collection = db.controls
 
 ###
 # Pages
 ###
 
-def display_data():
+def fetch_data():
     """
     Obtains the newest document in the "lists" collection in database "todo".
 
@@ -43,18 +44,22 @@ def display_data():
     # This will translate into finding the newest inserted document.
     form_data = brevet_collection.find().sort("_id", -1).limit(1)
 
-    # lists is a PyMongo cursor, which acts like a pointer.
+    # form_data is a PyMongo cursor, which acts like a pointer.
     # We need to iterate through it, even if we know it has only one entry:
     for data in form_data:
-        return data["distance"], data["begin_date"], data["controls"]
+        return data["brevet"], data["begin_date"], data["controls"]
 
 
-def submit_data(distance, begin_date, controls):
+def insert_data(brevet, begin_date, controls):
     """
+    Inserts a new collection list into the database "brevet_collection", under the collection "lists".
+    
+    Inputs a title (string) and items (list of dictionaries)
+
     Returns the unique ID assigned to the document by mongo (primary key.)
     """
     output = brevet_collection.insert_one({
-                     "distance": distance,
+                     "brevet": brevet,
                      "begin_date": begin_date,
                      "controls": controls
                   })
@@ -75,20 +80,25 @@ def page_not_found(error):
     app.logger.debug("Page not found")
     return flask.render_template('404.html'), 404
 
-@app.route("/submit_btn", methods=["POST"])
-def submit():
+@app.route("/insert", methods=["POST"])
+def insert():
     try: 
+        # Read the entire request body as a JSON
+        # This will fail if the request body is NOT a JSON.
         input_json = request.json
-        distance = input_json["distance"] 
+        # if successful, input_json is automatically parsed into a python dictionary!
+        
+        # Because input_json is a dictionary, we can do this:
+        brevet = input_json["brevet"] 
         begin_date = input_json["begin_date"] 
         controls = input_json["controls"]
 
-        data_id = submit_data(distance, begin_date, controls)
+        todo_id = insert_data(brevet, begin_date, controls)
 
         return flask.jsonify(result={},
             message="Inserted!", 
             status=1, # This is defined by you. You just read this value in your javascript.
-            mongo_id=data_id)
+            mongo_id=todo_id)
     except:
         # The reason for the try and except is to ensure Flask responds with a JSON.
         # If Flask catches your error, it means you didn't catch it yourself,
@@ -99,14 +109,21 @@ def submit():
                         status=0, 
                         mongo_id='None')
 
-@app.route("/display_btn")
-def display():
+@app.route("/fetch")
+def fetch():
+        """
+        /fetch : fetches the newest to-do list from the database.
+
+        Accepts GET requests ONLY!
+
+        JSON interface: gets JSON, responds with JSON
+        """
         try:
-            distance, begin_date, controls = display_data()
+            brevet, begin_date, controls = fetch_data()
             return flask.jsonify(
-                result={"distance": distance, "begin_date": begin_date, "controls":controls}, 
+                result={"brevet": brevet, "begin_date": begin_date, "controls":controls}, 
                 status=1,
-                message="Successfully fetched a to-do list!")
+                message="Successfully fetched a brevet list!")
         except:
             return flask.jsonify(
                 result={}, 

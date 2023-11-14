@@ -14,6 +14,9 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
     time_min = 0
     index = 0
 
+    if control_dist_km > brevet_dist_km:
+        control_dist_km = brevet_dist_km
+
     if control_dist_km == 0:
         return brevet_start_time
     else:
@@ -34,6 +37,9 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
 
 def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
     time_max = 0
+
+    if control_dist_km > brevet_dist_km:
+        control_dist_km = brevet_dist_km
 
     if brevet_dist_km == 200 and control_dist_km == 200:
         # Calculate the time it takes to reach the control point
