@@ -6,7 +6,7 @@ Write your tests HERE AND ONLY HERE.
 import nose    # Testing framework
 import logging
 
-from flask_brevets import fetch_data, insert_data # import function fetch_data and insert_data from flask_brevets
+from mongo_db import fetch_data, insert_data # import function fetch_data and insert_data from flask_brevets
 
 logging.basicConfig(format='%(levelname)s:%(message)s',
                     level=logging.WARNING)
