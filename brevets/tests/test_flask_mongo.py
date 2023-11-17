@@ -19,5 +19,11 @@ def test_insert():
 
 
 def test_fetch():
-    # a response object with JSON data.
+    #insert_data('200', "2021-01-01T00:00", [{"miles":0,"km": 0,"location":"", "open": "2021-01-01T00:00", "close": "2021-01-01T01:00"}])
+
+    brevet, begin_date, controls = fetch_data()
+
+    assert brevet == '200'
+    assert begin_date == "2021-01-01T00:00"
+
     assert 1 == 1

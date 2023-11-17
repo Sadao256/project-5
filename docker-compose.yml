@@ -8,6 +8,7 @@ services:
         - "5001:5000"
       depends_on:
         - brevetsdb
+      tty: true
       environment:
           MONGODB_HOSTNAME: brevetsdb
     brevetsdb:
